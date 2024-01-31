@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update User</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="body_addLessons">
+<form method="post" action="/update/user" enctype="multipart/form-data" >
+    <input type="hidden" name="id" th:value="${user.id}">
+    <input type="hidden" name="password" th:value="${user.password}">
+    <input type="hidden" name="userType" th:value="${user.userType}">
+    <input type="hidden" name="email" th:value="${user.email}"><br>
+    Name: <input type="text" name="name" th:value="${user.name}"> <br>
+    New Picture: <input type="file" name="picture"><br>
+    <input type="submit" value="update">
+    <img th:if="${user.getPicName() != null}" th:src="@{/getImage(picName=${user.picName})}" width="100"/>
+    <a th:if="${user.getPicName() != null}" th:href="@{'/delete/picture/'(id=${user.id})}">Delete Picture</a>
+</form>
+</body>
+</html>

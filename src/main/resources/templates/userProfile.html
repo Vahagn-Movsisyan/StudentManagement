@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:title="${user.name}"></title>
+</head>
+<body>
+<div>
+    <img th:if="${user.getPicName() != null}" th:src="@{/getImage(picName=${user.picName})}" width="100"/>
+    <img th:if="${user.getPicName() == null}" src="/img/user.png"/>
+    <h1 th:text="${user.name}"></h1>
+    <a th:href="@{'/update/user/page/' + ${user.id}}">Update Profile</a>
+</div>
+<div>
+    <table>
+        <tr>
+            <th th:text="${user.email}"></th>
+            <th th:text="${user.userType}"></th>
+        </tr>
+    </table>
+</div>
+<div>
+    <h1>My Lessons</h1>
+    <table>
+        <tr th:each="lesson : ${user.lesson}">
+            <th th:text="${lesson.title}"></th>
+            <th th:date="${lesson.startDate}"></th>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

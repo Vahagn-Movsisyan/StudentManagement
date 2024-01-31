@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="body_lessons">
+<h1>Lessons</h1>
+<a href="/my/lessons">My Lessons</a>
+<table>
+    <tbody th:if="${lessons == null and #lists.isEmpty(lessons)}">
+    <tr>
+        <td colspan="8">No lessons found</td>
+    </tr>
+    </tbody>
+    <thead>
+    <tr>
+        <th>Lesson Id</th>
+        <th>Title</th>
+        <th>Duration</th>
+        <th>Price</th>
+        <th>Start Date</th>
+        <th>Teacher</th>
+    </tr>
+    </thead>
+    <tbody th:if="${lessons != null and not #lists.isEmpty(lessons)}">
+    <tr th:each="lesson : ${lessons}">
+        <th th:text="${lesson.id}"></th>
+        <th th:text="${lesson.title}"></th>
+        <th th:time="${lesson.duration}">
+            <span th:if="${lesson.duration == null}">soon</span>
+            <span th:if="${lesson.duration != null}" th:text="${lesson.duration}"></span>
+        </th>
+        <th th:text="${lesson.price}"></th>
+        <th>
+            <span th:if="${lesson.startDate == null}">soon</span>
+            <span th:if="${lesson.startDate != null}" th:text="${lesson.startDate}"></span>
+        </th>
+        <th th:text="${lesson.user.name}"></th>
+    </tr>
+    </tbody>
+</table>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+</body>
+</html>

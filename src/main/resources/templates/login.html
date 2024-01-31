@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+
+<div class="container" id="container">
+    <div class="form-container sign-up-container">
+        <form action="/user/register" method="post" enctype="multipart/form-data">
+            <h1>Create Account</h1>
+            <span>or use your email for registration</span>
+            <div th:if="${errorRegister != null}" class="error-message">
+                <p th:text="${errorRegister}"></p>
+            </div> <input type="text" placeholder="Name" name="name" />
+            <input type="email" placeholder="Email" name="email" />
+            <input type="password" placeholder="Password" name="password" />
+            <input type="password" placeholder="ConfirmPassword" name="confirmPassword"/>
+            Student/Teacher <select name="userType">
+                <option th:each="type : ${userTypes}" th:value="${type}" th:text="${type}"></option>
+            </select>
+            <input type="file" name="picture">
+            <button>Sign Up</button>
+        </form>
+    </div>
+    <div class="form-container sign-in-container">
+        <form action="/user/login" method="post">
+            <h1>Sign in</h1>
+            <span>or use your account</span>
+            <div th:if="${errorLogin != null}" class="error-message">
+                <p th:text="${errorLogin}"></p>
+            </div>
+            <input type="email" placeholder="Email" name="email" />
+            <input type="password" placeholder="Password" name="password"/>
+            <a href="#">Forgot your password?</a>
+            <button>Sign In</button>
+        </form>
+    </div>
+    <div class="overlay-container">
+        <div class="overlay">
+            <div class="overlay-panel overlay-left">
+                <h1>Welcome Back!</h1>
+                <p>To keep connected with us please login with your personal info</p>
+                <button class="ghost" id="signIn">Sign In</button>
+            </div>
+            <div class="overlay-panel overlay-right">
+                <h1>Hello, Friend!</h1>
+                <p>Enter your personal details and start journey with us</p>
+                <button class="ghost" id="signUp">Sign Up</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/login.js"></script>
+</body>
+</html>
