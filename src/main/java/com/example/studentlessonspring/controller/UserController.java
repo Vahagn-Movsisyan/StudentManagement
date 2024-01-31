@@ -65,14 +65,13 @@ public class UserController {
 
     @PostMapping("/user/login")
     public String loginUser(@ModelAttribute User user, Model model, HttpSession session) {
-        User userByEmail = userRepository.findByEmail(user.getEmail());
-        if (userByEmail != null && userByEmail.getEmail().equals(user.getEmail()) && userByEmail.getPassword().equals(user.getPassword())) {
-            session.setAttribute("user", userByEmail);
-            return "redirect:/home";
-        } else {
-            model.addAttribute("errorLogin", "Invalid email or password");
-            return "redirect:/";
-        }
+        userRepository.findByEmail(user.getEmail()).ifPresent(dbUser -> {
+            if (dbUser.getPassword().equals(user.getPassword())) {
+                session.setAttribute("user", dbUser);
+            }
+        });
+        model.addAttribute("errorLogin", "Invalid email or password");
+        return "redirect:/";
     }
 
     @PostMapping("/user/register")
@@ -81,7 +80,9 @@ public class UserController {
                                @RequestParam("picture") MultipartFile multipartFile,
                                Model model,
                                HttpSession session) {
-        if (userRepository.findByEmail(user.getEmail()) != null) {
+        Optional<User> userByEmail = userRepository.findByEmail(user.getEmail());
+
+        if (userByEmail.isPresent()) {
             model.addAttribute("errorRegister", "Email is already in use");
             return "redirect:/";
         } else if (!user.getPassword().equals(confirmPassword)) {
