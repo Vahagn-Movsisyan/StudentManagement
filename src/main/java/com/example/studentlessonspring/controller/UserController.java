@@ -65,12 +65,18 @@ public class UserController {
 
     @PostMapping("/user/login")
     public String loginUser(@ModelAttribute User user, Model model, HttpSession session) {
-        userRepository.findByEmail(user.getEmail()).ifPresent(dbUser -> {
-            if (dbUser.getPassword().equals(user.getPassword())) {
-                session.setAttribute("user", dbUser);
+        Optional<User> userByEmail = userRepository.findByEmail(user.getEmail());
+        if (userByEmail.isPresent()) {
+            User getUserByEmail = userByEmail.get();
+            if (getUserByEmail.getEmail().equals(user.getEmail()) && getUserByEmail.getPassword().equals(user.getPassword())) {
+                session.setAttribute("user", getUserByEmail);
+                return "redirect:/home";
             }
-        });
-        model.addAttribute("errorLogin", "Invalid email or password");
+        }
+        else {
+            model.addAttribute("errorLogin", "Invalid email or password");
+            return "redirect:/";
+        }
         return "redirect:/";
     }
 
