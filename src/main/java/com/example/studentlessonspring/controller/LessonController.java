@@ -4,13 +4,14 @@ import com.example.studentlessonspring.entity.Lesson;
 import com.example.studentlessonspring.entity.User;
 import com.example.studentlessonspring.entity.UserType;
 import com.example.studentlessonspring.repository.LessonRepository;
-import jakarta.servlet.http.HttpSession;
+import com.example.studentlessonspring.security.SpringUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,32 +27,26 @@ public class LessonController {
     }
 
     @PostMapping("/add/lesson")
-    public String addLesson(@ModelAttribute Lesson lesson, HttpSession session) {
-        User user = (User) session.getAttribute("user");
+    public String addLesson(@ModelAttribute Lesson lesson, @AuthenticationPrincipal SpringUser springUser) {
+        User user = springUser.getUser();
         lesson.setUser(user);
         lessonRepository.save(lesson);
         return "redirect:/my/lessons";
     }
 
     @GetMapping("/my/lessons")
-    public String lessons(ModelMap modelMap, HttpSession session) {
-        User user = (User) session.getAttribute("user");
+    public String lessons(ModelMap modelMap, @AuthenticationPrincipal SpringUser springUser) {
+        User user = springUser.getUser();
         List<Lesson> lessons = lessonRepository.findLessonByUserId(user.getId());
         modelMap.put("lessons", lessons);
         return "myLessons";
     }
 
     @GetMapping("/all/lessons")
-    public String allLessons(ModelMap modelMap, HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        if (user.getUserType() == UserType.STUDENT) {
-            modelMap.addAttribute("lessons", lessonRepository.findAll());
-            return "lessonsForStudent";
-        } else if (user.getUserType() == UserType.TEACHER) {
-            modelMap.addAttribute("lessons", lessonRepository.findAll());
-            return "lessons";
-        }
-      return "redirect:/home";
+    public String allLessons(ModelMap modelMap) {
+        List<Lesson> lessonRepositoryAll = lessonRepository.findAll();
+        modelMap.addAttribute("lessons", lessonRepositoryAll);
+        return "lessons";
     }
 
     @GetMapping("/update/lesson/page/{id}")
@@ -66,8 +61,8 @@ public class LessonController {
     }
 
     @PostMapping("/update/lesson")
-    public String updateLesson(@ModelAttribute Lesson lesson, HttpSession session) {
-        User user = (User) session.getAttribute("user");
+    public String updateLesson(@ModelAttribute Lesson lesson, @AuthenticationPrincipal SpringUser springUser) {
+        User user = springUser.getUser();
         lesson.setUser(user);
         lessonRepository.save(lesson);
         return "redirect:/my/lessons";

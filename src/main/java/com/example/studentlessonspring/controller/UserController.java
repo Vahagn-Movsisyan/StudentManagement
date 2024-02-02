@@ -5,12 +5,14 @@ import com.example.studentlessonspring.entity.User;
 import com.example.studentlessonspring.entity.UserType;
 import com.example.studentlessonspring.repository.LessonRepository;
 import com.example.studentlessonspring.repository.UserRepository;
+import com.example.studentlessonspring.security.SpringUser;
 import com.example.studentlessonspring.util.MultipartUtil;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.Banner;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +29,7 @@ public class UserController {
 
     private final UserRepository userRepository;
     private final LessonRepository lessonRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${picture.upload.directory}")
     private String uploadDirectory;
@@ -63,63 +66,47 @@ public class UserController {
         return "teachers";
     }
 
-    @PostMapping("/user/login")
-    public String loginUser(@ModelAttribute User user, Model model, HttpSession session) {
-        Optional<User> userByEmail = userRepository.findByEmail(user.getEmail());
-        if (userByEmail.isPresent()) {
-            User getUserByEmail = userByEmail.get();
-            if (getUserByEmail.getEmail().equals(user.getEmail()) && getUserByEmail.getPassword().equals(user.getPassword())) {
-                session.setAttribute("user", getUserByEmail);
-                return "redirect:/home";
-            }
+    @GetMapping("/login/page")
+    public String loginPage() {
+        return "redirect:/login";
+    }
+    @GetMapping("/register")
+    public String registerPage(@RequestParam(value = "msg", required = false) String msg, ModelMap modelMap) {
+        if (msg != null && !msg.isEmpty()) {
+            modelMap.addAttribute("msg", msg);
         }
-        else {
-            model.addAttribute("errorLogin", "Invalid email or password");
-            return "redirect:/";
-        }
-        return "redirect:/";
+        modelMap.addAttribute("userTypes", UserType.values());
+        return "register";
     }
 
     @PostMapping("/user/register")
     public String registerUser(@ModelAttribute User user,
                                @RequestParam String confirmPassword,
-                               @RequestParam("picture") MultipartFile multipartFile,
-                               Model model,
-                               HttpSession session) {
+                               @RequestParam("picture") MultipartFile multipartFile) {
         Optional<User> userByEmail = userRepository.findByEmail(user.getEmail());
 
         if (userByEmail.isPresent()) {
-            model.addAttribute("errorRegister", "Email is already in use");
-            return "redirect:/";
+            return "redirect:/register?msg=Email is already in use";
         } else if (!user.getPassword().equals(confirmPassword)) {
-            model.addAttribute("errorRegister", "Passwords do not match");
-            return "redirect:/";
+            return "redirect:/register?msg=Passwords do not match";
         }
 
         try {
             MultipartUtil.processImageUpload(user, multipartFile, uploadDirectory);
         } catch (IOException e) {
             e.printStackTrace();
-            model.addAttribute("errorRegister", "Error uploading profile picture");
-            return "redirect:/";
+            return "redirect:/user/login?msg=Invalid picture please try again";
         }
 
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
-        session.setAttribute("user", user);
-        model.addAttribute("currentUserType", user.getUserType());
-        return "redirect:/home";
+        return "redirect:/";
     }
 
     @GetMapping("/user/profile")
-    public String usersProfile(ModelMap modelMap, HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        user.setId(user.getId());
-        Optional<User> userById = userRepository.findById(user.getId());
-        if (userById.isPresent()) {
-            modelMap.addAttribute("user", userById.get());
-        } else {
-            return "redirect:/users";
-        }
+    public String usersProfile(@AuthenticationPrincipal SpringUser springUser, ModelMap modelMap) {
+        User user = springUser.getUser();
+        modelMap.addAttribute("user", user);
         return "userProfile";
     }
 
@@ -144,13 +131,13 @@ public class UserController {
     }
 
     @GetMapping("/register/lesson/{id}")
-    public String registerLesson(@PathVariable("id") int id, HttpSession session) {
-        User user = (User) session.getAttribute("user");
+    public String registerLesson(@PathVariable("id") int id, @AuthenticationPrincipal SpringUser springUser) {
+        User user = springUser.getUser();
         Optional<Lesson> lessonById = lessonRepository.findById(id);
         if (lessonById.isPresent()) {
             List<Lesson> lessons = new ArrayList<>();
             lessons.add(lessonById.get());
-            user.setLesson(lessons);
+            user.setLessons(lessons);
             userRepository.save(user);
         }
         return "redirect:/user/profile";

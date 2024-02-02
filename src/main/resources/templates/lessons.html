@@ -6,8 +6,13 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="body_lessons">
+<th:block th:include="/fragment/headerFragment::userInfo"></th:block>
 <h1>Lessons</h1>
-<a href="/my/lessons">My Lessons</a>
+<span>
+    <a th:if="${currentUser != null and currentUser.userType.name() == 'TEACHER'}" href="/my/lessons">My Lessons</a>
+    <a th:if="${currentUser != null and currentUser.userType.name() == 'STUDENT'}" href="/user/profile">Registered Lessons</a>
+    <a th:if="${currentUser == null}" href="/register">For watching your lessons, sign in</a>
+    </span>
 <table>
     <tbody th:if="${lessons == null and #lists.isEmpty(lessons)}">
     <tr>
@@ -22,6 +27,9 @@
         <th>Price</th>
         <th>Start Date</th>
         <th>Teacher</th>
+        <span th:if="${currentUser != null and currentUser.userType == 'STUDENT'}">
+                    <th>Register</th>
+        </span>
     </tr>
     </thead>
     <tbody th:if="${lessons != null and not #lists.isEmpty(lessons)}">
@@ -38,6 +46,9 @@
             <span th:if="${lesson.startDate != null}" th:text="${lesson.startDate}"></span>
         </th>
         <th th:text="${lesson.user.name}"></th>
+        <span th:if="${currentUser != null and currentUser.userType.name() == 'STUDENT'}">
+                    <th><a class="update-button" th:href="@{'/register/lesson/' + ${lesson.id}}">Register</a></th>
+                </span>
     </tr>
     </tbody>
 </table>

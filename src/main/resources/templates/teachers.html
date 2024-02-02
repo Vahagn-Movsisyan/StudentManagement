@@ -6,8 +6,11 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="body_lessons">
+<th:block th:include="/fragment/headerFragment::userInfo"></th:block>
 
-<a href="/user/profile">My Profile</a>
+<span>
+    <a th:if="${currentUser != null and currentUser.userType.name() == 'TEACHER'}" href="/user/profile">My Profile</a>
+</span>
 <table>
     <tbody th:if="${usersByType == null and #lists.isEmpty(usersByType)}">
     <tr>
@@ -32,7 +35,7 @@
         </th>
         <th th:text="${user.name}"></th>
         <th th:text="${user.email}"></th>
-        <th th:text="${user.lesson.size()}"></th>
+        <th th:text="${user.lessons.size()}"></th>
         <th th:text="${user.userType}"></th>
     </tr>
     </tbody>

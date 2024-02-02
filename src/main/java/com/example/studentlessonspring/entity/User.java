@@ -22,7 +22,7 @@ public class User {
     private String picName;
 
     @OneToMany(mappedBy = "user")
-    private List<Lesson> lesson;
+    private List<Lesson> lessons;
 
     @Enumerated(EnumType.STRING)
     private UserType userType;

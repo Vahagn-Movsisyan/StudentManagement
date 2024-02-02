@@ -11,16 +11,14 @@
     <div class="form-container sign-up-container">
         <form action="/user/register" method="post" enctype="multipart/form-data">
             <h1>Create Account</h1>
-            <span>or use your email for registration</span>
-            <div th:if="${errorRegister != null}" class="error-message">
-                <p th:text="${errorRegister}"></p>
-            </div> <input type="text" placeholder="Name" name="name" />
-            <input type="email" placeholder="Email" name="email" />
-            <input type="password" placeholder="Password" name="password" />
+            <span th:if="${msg != null}" style="color: red" th:text="${msg}"></span>
+            <input type="text" placeholder="Name" name="name"/>
+            <input type="email" placeholder="Email" name="email"/>
+            <input type="password" placeholder="Password" name="password"/>
             <input type="password" placeholder="ConfirmPassword" name="confirmPassword"/>
             Student/Teacher <select name="userType">
-                <option th:each="type : ${userTypes}" th:value="${type}" th:text="${type}"></option>
-            </select>
+            <option th:each="type : ${userTypes}" th:value="${type}" th:text="${type}"></option>
+        </select>
             <input type="file" name="picture">
             <button>Sign Up</button>
         </form>
@@ -29,10 +27,7 @@
         <form action="/user/login" method="post">
             <h1>Sign in</h1>
             <span>or use your account</span>
-            <div th:if="${errorLogin != null}" class="error-message">
-                <p th:text="${errorLogin}"></p>
-            </div>
-            <input type="email" placeholder="Email" name="email" />
+            <input type="email" placeholder="Email" name="email"/>
             <input type="password" placeholder="Password" name="password"/>
             <a href="#">Forgot your password?</a>
             <button>Sign In</button>
