@@ -70,6 +70,7 @@ public class UserController {
     public String loginPage() {
         return "redirect:/login";
     }
+
     @GetMapping("/register")
     public String registerPage(@RequestParam(value = "msg", required = false) String msg, ModelMap modelMap) {
         if (msg != null && !msg.isEmpty()) {
