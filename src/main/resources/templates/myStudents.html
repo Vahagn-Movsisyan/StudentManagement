@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Students</title>
+</head>
+<body>
+<table>
+    <tbody th:unless="${students != null and not  #lists.isEmpty(students)}">
+    <tr>
+        <td colspan="8">No users found</td>
+    </tr>
+    </tbody>
+    <thead>
+    <tr>
+        <th>User Id</th>
+        <th>Picture</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Lessons</th>
+        <th>User Type</th>
+    </tr>
+    </thead>
+    <tbody th:if="${students != null and not #lists.isEmpty(students)}">
+    <tr th:each="student : ${students}">
+        <th th:text="${student.id}"></th>
+        <th> <img th:if="${student.getPicName() != null}" th:src="@{/getImage(picName=${student.picName})}" width="40"/>
+            <img th:if="${student.getPicName() == null}" src="/img/user.png" width="20"/>
+        </th>
+        <th th:text="${student.name}"></th>
+        <th th:text="${student.email}"></th>
+        <th>
+            <span th:text="${student.getLessonListAsStudent().size()}"></span>
+        </th>
+        <th th:text="${student.userType}"></th>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

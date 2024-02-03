@@ -39,7 +39,7 @@
             <span th:if="${lesson.startDate == null}">soon</span>
             <span th:if="${lesson.startDate != null}" th:text="${lesson.startDate}"></span>
         </th>
-        <th th:text="${lesson.user.name}"></th>
+        <th th:text="${lesson.teacher.name}"></th>
         <td><a class="update-button" th:href="@{'/update/lesson/page/' + ${lesson.id}}">Update</a> </td>
         <td><a class="remove-button" th:href="@{'/delete/lessons/' + ${lesson.id}}">Delete</a> </td>
     </tr>

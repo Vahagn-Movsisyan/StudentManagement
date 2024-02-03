@@ -35,7 +35,9 @@
         </th>
         <th th:text="${user.name}"></th>
         <th th:text="${user.email}"></th>
-        <th th:text="${user.lessonList.size()}"></th>
+        <th>
+            <span th:text="${user.getLessonListAsTeacher().size()}"></span>
+        </th>
         <th th:text="${user.userType}"></th>
     </tr>
     </tbody>

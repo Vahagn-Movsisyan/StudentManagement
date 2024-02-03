@@ -71,6 +71,39 @@ public class UserController {
         return "redirect:/login";
     }
 
+    @GetMapping("/user/profile")
+    public String usersProfile() {
+        return "userProfile";
+    }
+
+    @GetMapping("/my/students")
+    public String myStudents(ModelMap modelMap, @AuthenticationPrincipal SpringUser springUser) {
+        User user = springUser.getUser();
+        if (user.getUserType() == UserType.TEACHER) {
+            List<User> studentsList = new ArrayList<>();
+            for (Lesson lesson : lessonRepository.findLessonByTeacherId(user.getId())) {
+                User student = lesson.getStudent();
+                if (student != null) {
+                    studentsList.add(student);
+                }
+            }
+            modelMap.addAttribute("students", studentsList);
+            return "myStudents";
+        }
+        return "redirect:/teachers";
+    }
+
+    @GetMapping("/update/user/page/{id}")
+    public String updateUser(@PathVariable("id") int id, ModelMap modelMap) {
+        Optional<User> userById = userRepository.findById(id);
+        if (userById.isPresent()) {
+            modelMap.addAttribute("user", userById.get());
+        } else {
+            return "redirect:/userProfile";
+        }
+        return "updateUser";
+    }
+
     @GetMapping("/register")
     public String registerPage(@RequestParam(value = "msg", required = false) String msg, ModelMap modelMap) {
         if (msg != null && !msg.isEmpty()) {
@@ -104,41 +137,12 @@ public class UserController {
         return "redirect:/";
     }
 
-    @GetMapping("/user/profile")
-    public String usersProfile() {
-        return "userProfile";
-    }
-
-    @GetMapping("/update/user/page/{id}")
-    public String updateUser(@PathVariable("id") int id, ModelMap modelMap) {
-        Optional<User> userById = userRepository.findById(id);
-        if (userById.isPresent()) {
-            modelMap.addAttribute("user", userById.get());
-        } else {
-            return "redirect:/userProfile";
-        }
-        return "updateUser";
-    }
-
     @PostMapping("/update/user")
     public String updateUser(@ModelAttribute User user,
                              @RequestParam("picture")
                              MultipartFile multipartFile) throws IOException {
         MultipartUtil.processImageUpload(user, multipartFile, uploadDirectory);
         userRepository.save(user);
-        return "redirect:/user/profile";
-    }
-
-    @GetMapping("/register/lesson/{id}")
-    public String registerLesson(@PathVariable("id") int id, @AuthenticationPrincipal SpringUser springUser) {
-        User user = springUser.getUser();
-        Optional<Lesson> lessonById = lessonRepository.findById(id);
-        if (lessonById.isPresent()) {
-            List<Lesson> lessons = new ArrayList<>();
-            lessons.add(lessonById.get());
-            user.setLessonList(lessons);
-            userRepository.save(user);
-        }
         return "redirect:/user/profile";
     }
 }

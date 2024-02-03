@@ -22,8 +22,15 @@
 </div>
 <div>
     <h1>My Lessons</h1>
-    <table>
-        <tr th:each="lesson : ${currentUser.lessonList}">
+    <table th:if="${currentUser.userType.name() == 'TEACHER'}">
+        <tr th:each="lesson : ${currentUser.lessonListAsTeacher}">
+            <th th:if="${lesson == null}">No Actual Lessons</th>
+            <th th:if="${lesson != null}" th:text="${lesson.title}"></th>
+            <th th:if="${lesson != null}" th:date="${lesson.startDate}"></th>
+        </tr>
+    </table>
+    <table th:if="${currentUser.userType.name() == 'STUDENT'}">
+        <tr th:each="lesson : ${currentUser.lessonListAsStudent}">
             <th th:if="${lesson == null}">No Actual Lessons</th>
             <th th:if="${lesson != null}" th:text="${lesson.title}"></th>
             <th th:if="${lesson != null}" th:date="${lesson.startDate}"></th>

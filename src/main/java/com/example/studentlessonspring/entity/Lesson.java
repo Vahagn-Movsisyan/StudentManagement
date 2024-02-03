@@ -26,5 +26,10 @@ public class Lesson {
     private Date startDate;
 
     @ManyToOne
-    private User user;
+    @JoinColumn(name = "teacher_id")
+    private User teacher;
+
+    @ManyToOne
+    @JoinColumn(name = "student_id")
+    private User student;
 }
