@@ -10,6 +10,7 @@
 
 <span>
     <a th:if="${currentUser != null and currentUser.userType.name() == 'STUDENT'}" href="/user/profile">My Profile</a>
+    <a th:if="${currentUser != null and currentUser.userType.name() == 'TEACHER'}" href="/my/students">My Profile</a>
 </span>
 <table>
     <tbody th:unless="${usersByType != null and not  #lists.isEmpty(usersByType)}">
@@ -35,7 +36,7 @@
         </th>
         <th th:text="${user.name}"></th>
         <th th:text="${user.email}"></th>
-        <th th:text="${user.lessons.size()}"></th>
+        <th th:text="${user.lessonList.size()}"></th>
         <th th:text="${user.userType}"></th>
     </tr>
     </tbody>

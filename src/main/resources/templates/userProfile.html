@@ -2,28 +2,28 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:title="${user.name}"></title>
+    <title th:title="${currentUser.name}"></title>
 </head>
 <body>
 <th:block th:include="/fragment/headerFragment::userInfo"></th:block>
 <div>
-    <img th:if="${user.getPicName() != null}" th:src="@{/getImage(picName=${user.picName})}" width="100"/>
-    <img th:if="${user.getPicName() == null}" src="/img/user.png" width="40"/>
-    <h1 th:text="${user.name}"></h1>
-    <a th:href="@{'/update/user/page/' + ${user.id}}">Update Profile</a>
+    <img th:if="${currentUser.getPicName() != null}" th:src="@{/getImage(picName=${currentUser.picName})}" width="100"/>
+    <img th:if="${currentUser.getPicName() == null}" src="/img/user.png" width="40"/>
+    <h1 th:text="${currentUser.name}"></h1>
+    <a th:href="@{'/update/user/page/' + ${currentUser.id}}">Update Profile</a>
 </div>
 <div>
     <table>
         <tr>
-            <th th:text="${user.email}"></th>
-            <th th:text="${user.userType}"></th>
+            <th th:text="${currentUser.email}"></th>
+            <th th:text="${currentUser.userType}"></th>
         </tr>
     </table>
 </div>
 <div>
     <h1>My Lessons</h1>
     <table>
-        <tr th:each="lesson : ${user.lessons}">
+        <tr th:each="lesson : ${currentUser.lessonList}">
             <th th:if="${lesson == null}">No Actual Lessons</th>
             <th th:if="${lesson != null}" th:text="${lesson.title}"></th>
             <th th:if="${lesson != null}" th:date="${lesson.startDate}"></th>

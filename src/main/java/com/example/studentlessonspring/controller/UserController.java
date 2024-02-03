@@ -105,9 +105,7 @@ public class UserController {
     }
 
     @GetMapping("/user/profile")
-    public String usersProfile(@AuthenticationPrincipal SpringUser springUser, ModelMap modelMap) {
-        User user = springUser.getUser();
-        modelMap.addAttribute("user", user);
+    public String usersProfile() {
         return "userProfile";
     }
 
@@ -138,7 +136,7 @@ public class UserController {
         if (lessonById.isPresent()) {
             List<Lesson> lessons = new ArrayList<>();
             lessons.add(lessonById.get());
-            user.setLessons(lessons);
+            user.setLessonList(lessons);
             userRepository.save(user);
         }
         return "redirect:/user/profile";

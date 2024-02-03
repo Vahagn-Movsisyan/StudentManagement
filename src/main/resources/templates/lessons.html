@@ -48,10 +48,9 @@
         <th th:text="${lesson.user.name}"></th>
         <span th:if="${currentUser != null and currentUser.userType.name() == 'STUDENT'}">
                     <th><a class="update-button" th:href="@{'/register/lesson/' + ${lesson.id}}">Register</a></th>
-                </span>
+        </span>
     </tr>
     </tbody>
 </table>
-<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 </body>
 </html>

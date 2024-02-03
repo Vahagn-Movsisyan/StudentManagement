@@ -21,8 +21,8 @@ public class User {
     private String password;
     private String picName;
 
-    @OneToMany(mappedBy = "user")
-    private List<Lesson> lessons;
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private List<Lesson> lessonList;
 
     @Enumerated(EnumType.STRING)
     private UserType userType;
