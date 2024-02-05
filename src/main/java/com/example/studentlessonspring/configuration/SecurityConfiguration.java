@@ -11,8 +11,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import java.util.Locale;
-
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfiguration {
@@ -28,7 +26,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/all/lessons").permitAll()
                 .requestMatchers("/students").permitAll()
                 .requestMatchers("/teachers").permitAll()
-                .requestMatchers("/register").permitAll()
+                .requestMatchers("/login/page").permitAll()
                 .requestMatchers("/user/register").permitAll()
                 .requestMatchers("/my/lessons").hasAnyAuthority(UserType.TEACHER.name())
                 .requestMatchers("/add/lesson/page").hasAnyAuthority(UserType.TEACHER.name())
@@ -37,6 +35,10 @@ public class SecurityConfiguration {
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
+                .loginPage("/login/page")
+                .loginProcessingUrl("/login")
+                .successForwardUrl("/")
+                .defaultSuccessUrl("/", true)
                 .and()
                 .logout()
                 .logoutSuccessUrl("/");

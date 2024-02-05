@@ -3,15 +3,14 @@ package com.example.studentlessonspring.controller;
 import com.example.studentlessonspring.entity.Lesson;
 import com.example.studentlessonspring.entity.User;
 import com.example.studentlessonspring.entity.UserType;
-import com.example.studentlessonspring.repository.LessonRepository;
-import com.example.studentlessonspring.repository.UserRepository;
+import com.example.studentlessonspring.exceptions.EmailIsPresentException;
+import com.example.studentlessonspring.exceptions.PasswordNotMuchException;
 import com.example.studentlessonspring.security.SpringUser;
+import com.example.studentlessonspring.service.LessonService;
+import com.example.studentlessonspring.service.UserService;
 import com.example.studentlessonspring.util.MultipartUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.Banner;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -19,56 +18,38 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Controller
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserRepository userRepository;
-    private final LessonRepository lessonRepository;
-    private final PasswordEncoder passwordEncoder;
-
-    @Value("${picture.upload.directory}")
-    private String uploadDirectory;
+    private final UserService userService;
+    private final LessonService lessonService;
 
     @GetMapping("/delete/picture/")
     public String deletePicture(@RequestParam("id") int id) {
-        Optional<User> userById = userRepository.findById(id);
-        if (userById.isPresent()) {
-            User user = userById.get();
-            String picName = user.getPicName();
-            if (picName != null) {
-                user.setPicName(null);
-                userRepository.save(user);
-                File file = new File(uploadDirectory, picName);
-                if (file.exists()) {
-                    file.delete();
-                }
-            }
-            return "redirect:/update/user/page/" + user.getId();
-        } else {
-            return "redirect:/userProfile";
-        }
+        userService.deletePicture(id);
+        return "redirect:/update/user/page/" + id;
     }
 
     @GetMapping("/students")
     public String students(ModelMap modelMap) {
-        modelMap.addAttribute("usersByType", userRepository.findUserByUserType(UserType.STUDENT));
+        modelMap.addAttribute("usersByType", userService.findUserByUserType(UserType.STUDENT));
         return "students";
     }
 
     @GetMapping("/teachers")
     public String teachers(ModelMap modelMap) {
-        modelMap.addAttribute("usersByType", userRepository.findUserByUserType(UserType.TEACHER));
+        modelMap.addAttribute("usersByType", userService.findUserByUserType(UserType.TEACHER));
         return "teachers";
     }
 
     @GetMapping("/login/page")
     public String loginPage() {
-        return "redirect:/login";
+        return "login";
     }
 
     @GetMapping("/user/profile")
@@ -80,14 +61,14 @@ public class UserController {
     public String myStudents(ModelMap modelMap, @AuthenticationPrincipal SpringUser springUser) {
         User user = springUser.getUser();
         if (user.getUserType() == UserType.TEACHER) {
-            List<User> studentsList = new ArrayList<>();
-            for (Lesson lesson : lessonRepository.findLessonByTeacherId(user.getId())) {
+            Set<User> studenstSet = new HashSet<>();
+            for (Lesson lesson : lessonService.findLessonByTeacherId(user.getId())) {
                 User student = lesson.getStudent();
                 if (student != null) {
-                    studentsList.add(student);
+                    studenstSet.add(student);
                 }
             }
-            modelMap.addAttribute("students", studentsList);
+            modelMap.addAttribute("students", studenstSet);
             return "myStudents";
         }
         return "redirect:/teachers";
@@ -95,7 +76,7 @@ public class UserController {
 
     @GetMapping("/update/user/page/{id}")
     public String updateUser(@PathVariable("id") int id, ModelMap modelMap) {
-        Optional<User> userById = userRepository.findById(id);
+        Optional<User> userById = userService.findById(id);
         if (userById.isPresent()) {
             modelMap.addAttribute("user", userById.get());
         } else {
@@ -110,30 +91,24 @@ public class UserController {
             modelMap.addAttribute("msg", msg);
         }
         modelMap.addAttribute("userTypes", UserType.values());
-        return "register";
+        return "login";
     }
 
     @PostMapping("/user/register")
-    public String registerUser(@ModelAttribute User user,
-                               @RequestParam String confirmPassword,
-                               @RequestParam("picture") MultipartFile multipartFile) {
-        Optional<User> userByEmail = userRepository.findByEmail(user.getEmail());
-
-        if (userByEmail.isPresent()) {
-            return "redirect:/register?msg=Email is already in use";
-        } else if (!user.getPassword().equals(confirmPassword)) {
-            return "redirect:/register?msg=Passwords do not match";
-        }
+    public String registerUser(
+            @ModelAttribute User user,
+            @RequestParam String confirmPassword,
+            @RequestParam("picture") MultipartFile multipartFile) {
 
         try {
-            MultipartUtil.processImageUpload(user, multipartFile, uploadDirectory);
+            userService.register(user, multipartFile, confirmPassword);
         } catch (IOException e) {
-            e.printStackTrace();
             return "redirect:/user/login?msg=Invalid picture please try again";
+        } catch (EmailIsPresentException e) {
+            return "redirect:/register?msg=Email is already in use";
+        } catch (PasswordNotMuchException e) {
+            return "redirect:/register?msg=Passwords do not match";
         }
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
         return "redirect:/";
     }
 
@@ -141,8 +116,7 @@ public class UserController {
     public String updateUser(@ModelAttribute User user,
                              @RequestParam("picture")
                              MultipartFile multipartFile) throws IOException {
-        MultipartUtil.processImageUpload(user, multipartFile, uploadDirectory);
-        userRepository.save(user);
+        userService.update(user, multipartFile);
         return "redirect:/user/profile";
     }
 }

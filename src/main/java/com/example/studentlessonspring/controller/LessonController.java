@@ -3,15 +3,15 @@ package com.example.studentlessonspring.controller;
 import com.example.studentlessonspring.entity.Lesson;
 import com.example.studentlessonspring.entity.User;
 import com.example.studentlessonspring.entity.UserType;
-import com.example.studentlessonspring.repository.LessonRepository;
 import com.example.studentlessonspring.security.SpringUser;
+import com.example.studentlessonspring.service.LessonService;
+import com.example.studentlessonspring.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +19,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LessonController {
 
-    private final LessonRepository lessonRepository;
+    private final LessonService lessonService;
+    private final UserService userService;
 
     @GetMapping("/add/lesson/page")
     public String addLessonPage() {
@@ -30,10 +31,10 @@ public class LessonController {
     public String lessons(ModelMap modelMap, @AuthenticationPrincipal SpringUser springUser) {
         User user = springUser.getUser();
         if (user.getUserType() == UserType.TEACHER) {
-            List<Lesson> lessons = lessonRepository.findLessonByTeacherId(user.getId());
+            List<Lesson> lessons = lessonService.findLessonByTeacherId(user.getId());
             modelMap.put("lessons", lessons);
         } else if (user.getUserType() == UserType.STUDENT) {
-            List<Lesson> lessons = lessonRepository.findLessonByStudentId(user.getId());
+            List<Lesson> lessons = lessonService.findLessonByStudentId(user.getId());
             modelMap.put("lessons", lessons);
         }
         return "myLessons";
@@ -41,7 +42,7 @@ public class LessonController {
 
     @GetMapping("/update/lesson/page/{id}")
     public String updateLessonPage(@PathVariable("id") int id, ModelMap modelMap) {
-        Optional<Lesson> lessonById = lessonRepository.findById(id);
+        Optional<Lesson> lessonById = lessonService.findById(id);
         if (lessonById.isPresent()) {
             modelMap.addAttribute("lesson", lessonById.get());
         } else {
@@ -52,25 +53,35 @@ public class LessonController {
 
     @GetMapping("/all/lessons")
     public String allLessons(ModelMap modelMap) {
-        List<Lesson> lessonRepositoryAll = lessonRepository.findAll();
+        List<Lesson> lessonRepositoryAll = lessonService.findAll();
         modelMap.addAttribute("lessons", lessonRepositoryAll);
         return "lessons";
     }
 
     @GetMapping("/delete/lessons/{id}")
     public String deleteLesson(@PathVariable("id") int id) {
-        lessonRepository.deleteById(id);
+        lessonService.deleteById(id);
         return "redirect:/my/lessons";
     }
 
     //For User
     @GetMapping("/register/lesson/{id}")
     public String registerLesson(@PathVariable("id") int id, @AuthenticationPrincipal SpringUser springUser) {
-        User user = springUser.getUser();
-        Optional<Lesson> lessonById = lessonRepository.findById(id);
-        Lesson lesson = lessonById.get();
-        lesson.setStudent(user);
-        lessonRepository.save(lesson);
+        User student = springUser.getUser();
+        Optional<Lesson> lessonById = lessonService.findById(id);
+
+        lessonById.ifPresent(lesson -> {
+            lesson.setStudent(student);
+
+            User teacher = lesson.getTeacher();
+            teacher.getLessonListAsTeacher().add(lesson);
+            teacher.getLessonListAsStudent().add(lesson);
+
+            userService.save(student);
+            userService.save(teacher);
+            lessonService.save(lesson);
+
+        });
         return "redirect:/user/profile";
     }
 
@@ -78,7 +89,7 @@ public class LessonController {
     public String addLesson(@ModelAttribute Lesson lesson, @AuthenticationPrincipal SpringUser springUser) {
         User user = springUser.getUser();
         lesson.setTeacher(user);
-        lessonRepository.save(lesson);
+        lessonService.save(lesson);
         return "redirect:/my/lessons";
     }
 
@@ -86,7 +97,7 @@ public class LessonController {
     public String updateLesson(@ModelAttribute Lesson lesson, @AuthenticationPrincipal SpringUser springUser) {
         User user = springUser.getUser();
         lesson.setTeacher(user);
-        lessonRepository.save(lesson);
+        lessonService.save(lesson);
         return "redirect:/my/lessons";
     }
 }

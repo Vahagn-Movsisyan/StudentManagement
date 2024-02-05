@@ -21,10 +21,10 @@ public class User {
     private String password;
     private String picName;
 
-    @OneToMany(mappedBy = "teacher", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "teacher", fetch = FetchType.LAZY)
     private List<Lesson> lessonListAsTeacher;
 
-    @OneToMany(mappedBy = "student", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
     private List<Lesson> lessonListAsStudent;
 
     @Enumerated(EnumType.STRING)
