@@ -21,11 +21,20 @@ public class User {
     private String password;
     private String picName;
 
-    @OneToMany(mappedBy = "teacher", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "teacher", fetch = FetchType.EAGER)
     private List<Lesson> lessonListAsTeacher;
 
-    @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_lesson",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "lesson_id"))
     private List<Lesson> lessonListAsStudent;
+
+    @OneToMany(mappedBy = "fromUser", fetch = FetchType.EAGER)
+    private List<Message> sendMessages;
+
+    @OneToMany(mappedBy = "toUser", fetch = FetchType.EAGER)
+    private List<Message> receiveMessages;
 
     @Enumerated(EnumType.STRING)
     private UserType userType;

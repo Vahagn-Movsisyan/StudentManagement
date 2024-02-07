@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.sql.Date;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -26,10 +27,9 @@ public class Lesson {
     private Date startDate;
 
     @ManyToOne
-    @JoinColumn(name = "teacher_id")
     private User teacher;
 
-    @ManyToOne
-    @JoinColumn(name = "student_id")
-    private User student;
+    @ManyToMany(mappedBy = "lessonListAsStudent", fetch = FetchType.EAGER)
+    private List<User> students;
+
 }

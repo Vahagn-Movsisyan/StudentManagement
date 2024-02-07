@@ -8,7 +8,6 @@ import com.example.studentlessonspring.exceptions.PasswordNotMuchException;
 import com.example.studentlessonspring.security.SpringUser;
 import com.example.studentlessonspring.service.LessonService;
 import com.example.studentlessonspring.service.UserService;
-import com.example.studentlessonspring.util.MultipartUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -16,7 +15,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Optional;
@@ -60,15 +58,14 @@ public class UserController {
     @GetMapping("/my/students")
     public String myStudents(ModelMap modelMap, @AuthenticationPrincipal SpringUser springUser) {
         User user = springUser.getUser();
+        Set<User> studentsSet = new HashSet<>();
         if (user.getUserType() == UserType.TEACHER) {
-            Set<User> studenstSet = new HashSet<>();
             for (Lesson lesson : lessonService.findLessonByTeacherId(user.getId())) {
-                User student = lesson.getStudent();
-                if (student != null) {
-                    studenstSet.add(student);
+                if (lesson != null) {
+                    studentsSet.addAll(lesson.getStudents());
                 }
             }
-            modelMap.addAttribute("students", studenstSet);
+            modelMap.addAttribute("students", studentsSet);
             return "myStudents";
         }
         return "redirect:/teachers";

@@ -1,0 +1,40 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+footer {
+    background-color: #f1f1f1;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+input[type="text"] {
+    width: 70%;
+    padding: 8px;
+    margin-right: 10px;
+}
+
+button {
+    padding: 8px;
+}
+
+.message {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 5px;
+}
+
+.from-me {
+    text-align: right;
+}
+
+.from-other {
+    text-align: left;
+}

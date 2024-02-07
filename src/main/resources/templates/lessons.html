@@ -47,7 +47,7 @@
         </th>
         <th th:text="${lesson.teacher.name}"></th>
         <span th:if="${currentUser != null and currentUser.userType.name() == 'STUDENT'}">
-                    <th><a class="update-button" th:href="@{'/register/lesson/' + ${lesson.id}}">Register</a></th>
+            <th><a class="update-button" th:href="@{'/register/lesson/' + ${lesson.id}}">Register</a></th>
         </span>
     </tr>
     </tbody>

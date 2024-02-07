@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>classmates</title>
+</head>
+<body>
+<table>
+    <tbody th:unless="${classmates != null and not  #lists.isEmpty(classmates)}">
+    <tr>
+        <td colspan="8">No users found</td>
+    </tr>
+    </tbody>
+    <thead>
+    <tr>
+        <th>User Id</th>
+        <th>Picture</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Lessons</th>
+        <th>User Type</th>
+    </tr>
+    </thead>
+    <tbody th:if="${classmates != null and not #lists.isEmpty(classmates)}">
+    <tr th:each="classmate : ${classmates}">
+        <th th:text="${classmate.id}"></th>
+        <th> <img th:if="${classmate.getPicName() != null}" th:src="@{/getImage(picName=${classmate.picName})}" width="40"/>
+            <img th:if="${classmate.getPicName() == null}" src="/img/user.png" width="20"/>
+        </th>
+        <th th:text="${classmate.name}"></th>
+        <th th:text="${classmate.email}"></th>
+        <th>
+            <span th:text="${classmate.getLessonListAsStudent().size()}"></span>
+        </th>
+        <th th:text="${classmate.userType}"></th>
+        <th>
+            <a class="update-button" th:href="@{'/chat/' + ${classmate.id}}">message</a>
+        </th>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

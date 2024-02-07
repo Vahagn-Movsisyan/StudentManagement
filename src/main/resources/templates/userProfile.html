@@ -33,7 +33,10 @@
         <tr th:each="lesson : ${currentUser.lessonListAsStudent}">
             <th th:if="${lesson == null}">No Actual Lessons</th>
             <th th:if="${lesson != null}" th:text="${lesson.title}"></th>
-            <th th:if="${lesson != null}" th:date="${lesson.startDate}"></th>
+            <th th:if="${lesson != null}" th:text="${lesson.startDate}"></th>
+            <th th:if="${lesson != null}" th:value="${lesson.id}">
+                <a th:href="@{'/classmates/' + ${lesson.id}}">classmates</a>
+            </th>
         </tr>
     </table>
 </div>

@@ -1,10 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Chat</title>
+    <link rel="stylesheet" href="/css/chat.css">
 </head>
 <body>
-
+<div th:if="${receiveMessages != null}" th:each="receiveMessage : ${receiveMessages}">
+        <p th:text="${receiveMessage.message}"></p>
+        <p th:text="${receiveMessage.localDateTime}"></p>
+    </div>
+</div>
+<footer>
+    <form action="/send" method="post">
+        <input th:if="${fromUser != null}" type="hidden" name="fromUser" th:value="${fromUser.id}">
+        <input th:if="${toUser != null}" type="hidden" name="toUser" th:value="${toUser.id}">
+        <input type="text" name="message" placeholder="Type your message...">
+        <input type="submit" value="send">
+    </form>
+</footer>
 </body>
 </html>

@@ -64,24 +64,28 @@ public class LessonController {
         return "redirect:/my/lessons";
     }
 
-    //For User
+    @GetMapping("/classmates/{id}")
+    public String classmates(@PathVariable("id") int id, ModelMap modelMap) {
+        Optional<Lesson> byId = lessonService.findById(id);
+        byId.ifPresent(lesson -> {
+            modelMap.addAttribute("classmates", lesson.getStudents());
+        });
+        return "classmates";
+    }
+
+    //For Student
     @GetMapping("/register/lesson/{id}")
     public String registerLesson(@PathVariable("id") int id, @AuthenticationPrincipal SpringUser springUser) {
         User student = springUser.getUser();
         Optional<Lesson> lessonById = lessonService.findById(id);
 
         lessonById.ifPresent(lesson -> {
-            lesson.setStudent(student);
-
-            User teacher = lesson.getTeacher();
-            teacher.getLessonListAsTeacher().add(lesson);
-            teacher.getLessonListAsStudent().add(lesson);
-
-            userService.save(student);
-            userService.save(teacher);
+            lesson.getStudents().add(student);
             lessonService.save(lesson);
-
+            student.getLessonListAsStudent().add(lesson);
+            userService.save(student);
         });
+
         return "redirect:/user/profile";
     }
 

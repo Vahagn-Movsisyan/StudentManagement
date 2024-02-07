@@ -32,7 +32,7 @@ public class LessonServiceImpl implements LessonService {
 
     @Override
     public List<Lesson> findLessonByStudentId(int id) {
-        return lessonRepository.findLessonByStudentId(id);
+        return lessonRepository.findLessonByStudentsId(id);
     }
 
     @Override
