@@ -11,8 +11,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -21,52 +24,56 @@ public class MessageController {
     private final UserService userService;
     private final MessageService messageService;
 
-    @GetMapping("/chat/page")
-    public String chatPage() {
-        return "redirect:/receive";
+    @GetMapping("/classmates")
+    public String classmates() {
+        return "classmates";
     }
 
     @GetMapping("/chat/{id}")
     public String chat(@PathVariable("id") int id, ModelMap modelMap, @AuthenticationPrincipal SpringUser springUser) {
         User fromUser = springUser.getUser();
         Optional<User> byId = userService.findById(id);
+
         if (byId.isPresent()) {
             User toUser = byId.get();
+
             modelMap.addAttribute("fromUser", fromUser);
             modelMap.addAttribute("toUser", toUser);
+
+            List<Message> receiveMessages = toUser.getSendMessages();
+            List<Message> sendMessages = fromUser.getSendMessages();
+
+            receiveMessages.sort(Comparator.comparing(Message::getLocalDateTime));
+            sendMessages.sort(Comparator.comparing(Message::getLocalDateTime));
+
+            modelMap.addAttribute("receiveMessages", receiveMessages);
+            modelMap.addAttribute("sendMessages", sendMessages);
             return "chat";
         }
-        return "classmates";
-    }
-
-    @GetMapping("/receive")
-    public String receive(ModelMap modelMap, @AuthenticationPrincipal SpringUser springUser) {
-        User user = springUser.getUser();
-        List<Message> sendMessages = user.getReceiveMessages();
-        modelMap.addAttribute("receiveMessages",sendMessages);
-        return "chat";
+        return "redirect:/classmates";
     }
 
     @PostMapping("/send")
-    public String send(@RequestParam(name = "fromUser") int fromUserId,
-                       @RequestParam(name = "toUser") int toUserId,
-                       @RequestParam(name = "message") String messageText) {
-        Optional<User> fromUser = userService.findById(fromUserId);
-        Optional<User> toUser = userService.findById(toUserId);
+    public String send(@ModelAttribute Message message, @RequestParam String sendMessage) {
+        Optional<User> fromUserOptional = userService.findById(message.getFromUser().getId());
+        Optional<User> toUserOptional = userService.findById(message.getToUser().getId());
 
-        if (fromUser.isPresent() && toUser.isPresent()) {
-            Message message = new Message();
-            message.setFromUser(fromUser.get());
-            message.setToUser(toUser.get());
-            message.setMessage(messageText);
+        if (fromUserOptional.isPresent() && toUserOptional.isPresent()) {
+            User fromUser = fromUserOptional.get();
+            User toUser = toUserOptional.get();
+
+            message.setFromUser(fromUser);
+            message.setToUser(toUser);
+            message.setMessage(sendMessage);
+
+            fromUser.getSendMessages().add(message);
+            toUser.getReceiveMessages().add(message);
 
             messageService.save(message);
-
-            fromUser.get().getSendMessages().add(message);
-            toUser.get().getReceiveMessages().add(message);
-            userService.save(fromUser.get());
-            userService.save(toUser.get());
+            userService.save(fromUser);
+            userService.save(toUser);
+            return "redirect:/chat/" + toUser.getId();
         }
-        return "redirect:/chat/page";
+        return "redirect:/classmates";
     }
 }

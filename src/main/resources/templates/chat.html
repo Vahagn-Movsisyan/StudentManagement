@@ -5,17 +5,27 @@
     <title>Chat</title>
     <link rel="stylesheet" href="/css/chat.css">
 </head>
-<body>
-<div th:if="${receiveMessages != null}" th:each="receiveMessage : ${receiveMessages}">
+<body >
+<div style="left: auto"  th:if="${receiveMessages != null}" th:each="receiveMessage : ${receiveMessages}">
         <p th:text="${receiveMessage.message}"></p>
         <p th:text="${receiveMessage.localDateTime}"></p>
-    </div>
+        <p th:text="${receiveMessage.toUser.name}"></p>
 </div>
+
+<br>
+<br>
+
+<div style="right: auto" th:if="${sendMessages != null}" th:each="sendMessage : ${sendMessages}">
+    <p th:text="${sendMessage.localDateTime}"></p>
+    <p th:text="${sendMessage.message}"></p>
+    <p th:text="${sendMessage.fromUser.name}"></p>
+</div>
+
 <footer>
     <form action="/send" method="post">
         <input th:if="${fromUser != null}" type="hidden" name="fromUser" th:value="${fromUser.id}">
         <input th:if="${toUser != null}" type="hidden" name="toUser" th:value="${toUser.id}">
-        <input type="text" name="message" placeholder="Type your message...">
+        <input type="text" name="sendMessage" placeholder="Type your message...">
         <input type="submit" value="send">
     </form>
 </footer>
