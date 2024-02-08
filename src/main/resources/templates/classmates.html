@@ -25,7 +25,7 @@
     <tr th:each="classmate : ${classmates}">
         <th th:text="${classmate.id}"></th>
         <th> <img th:if="${classmate.getPicName() != null}" th:src="@{/getImage(picName=${classmate.picName})}" width="40"/>
-            <img th:if="${classmate.getPicName() == null}" src="/img/user.png" width="20"/>
+             <img th:if="${classmate.getPicName() == null}" src="/img/user.png" width="20"/>
         </th>
         <th th:text="${classmate.name}"></th>
         <th th:text="${classmate.email}"></th>
@@ -34,7 +34,7 @@
         </th>
         <th th:text="${classmate.userType}"></th>
         <th>
-            <a class="update-button" th:href="@{'/chat/' + ${classmate.id}}">message</a>
+            <span th:if="${classmate.id != currentUser.id}"><a class="update-button" th:href="@{'/chat/' + ${classmate.id}}">message</a></span>
         </th>
     </tr>
     </tbody>

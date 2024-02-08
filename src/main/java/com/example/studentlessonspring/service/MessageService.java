@@ -3,10 +3,9 @@ package com.example.studentlessonspring.service;
 
 import com.example.studentlessonspring.entity.Message;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface MessageService {
     Message save(Message message);
-    Optional<Message> findMessageByFromUserId(int id);
-    Optional<Message> findMessageByToUserId(int id);
+    List<Message> findMessageByToUserIdAndFromUserId(int fromUserId, int toUserId);
 }

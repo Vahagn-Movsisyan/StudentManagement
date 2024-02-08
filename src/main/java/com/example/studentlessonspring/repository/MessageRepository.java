@@ -8,6 +8,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MessageRepository  extends JpaRepository<Message, Integer> {
-    Optional<Message> findMessageByFromUserId(int id);
-    Optional<Message> findMessageByToUserId(int id);
+    List<Message> findMessageByFromUserIdAndToUserId(int fromUserId, int toUserId);
 }

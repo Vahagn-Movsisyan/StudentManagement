@@ -11,11 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -36,18 +33,10 @@ public class MessageController {
 
         if (byId.isPresent()) {
             User toUser = byId.get();
-
             modelMap.addAttribute("fromUser", fromUser);
             modelMap.addAttribute("toUser", toUser);
-
-            List<Message> receiveMessages = toUser.getSendMessages();
-            List<Message> sendMessages = fromUser.getSendMessages();
-
-            receiveMessages.sort(Comparator.comparing(Message::getLocalDateTime));
-            sendMessages.sort(Comparator.comparing(Message::getLocalDateTime));
-
-            modelMap.addAttribute("receiveMessages", receiveMessages);
-            modelMap.addAttribute("sendMessages", sendMessages);
+            modelMap.addAttribute("sendMessages", fromUser.getSendMessages());
+            modelMap.addAttribute("receiveMessages", fromUser.getReceiveMessages());
             return "chat";
         }
         return "redirect:/classmates";
@@ -59,20 +48,15 @@ public class MessageController {
         Optional<User> toUserOptional = userService.findById(message.getToUser().getId());
 
         if (fromUserOptional.isPresent() && toUserOptional.isPresent()) {
-            User fromUser = fromUserOptional.get();
-            User toUser = toUserOptional.get();
-
-            message.setFromUser(fromUser);
-            message.setToUser(toUser);
+            message.setFromUser(fromUserOptional.get());
+            message.setToUser(toUserOptional.get());
             message.setMessage(sendMessage);
 
-            fromUser.getSendMessages().add(message);
-            toUser.getReceiveMessages().add(message);
+            fromUserOptional.get().getSendMessages().add(message);
+            toUserOptional.get().getReceiveMessages().add(message);
 
             messageService.save(message);
-            userService.save(fromUser);
-            userService.save(toUser);
-            return "redirect:/chat/" + toUser.getId();
+            return "redirect:/chat/" + toUserOptional.get().getId();
         }
         return "redirect:/classmates";
     }
