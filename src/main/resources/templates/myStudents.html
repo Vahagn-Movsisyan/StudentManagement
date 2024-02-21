@@ -25,7 +25,7 @@
     <tr th:each="student : ${students}">
         <th th:text="${student.id}"></th>
         <th> <img th:if="${student.getPicName() != null}" th:src="@{/getImage(picName=${student.picName})}" width="40"/>
-            <img th:if="${student.getPicName() == null}" src="/img/user.png" width="20"/>
+            <img th:if="${student.getPicName() == null}" src="/defaultImgs/user.png" width="20"/>
         </th>
         <th th:text="${student.name}"></th>
         <th th:text="${student.email}"></th>

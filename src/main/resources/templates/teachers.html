@@ -31,7 +31,7 @@
     <tr th:each="user : ${usersByType}">
         <th th:text="${user.id}"></th>
         <th> <img th:if="${user.getPicName() != null}" th:src="@{/getImage(picName=${user.picName})}" width="40"/>
-            <img th:if="${user.getPicName() == null}" src="/img/user.png" width="20"/>
+            <img th:if="${user.getPicName() == null}" src="/defaultImgs/user.png" width="20"/>
         </th>
         <th th:text="${user.name}"></th>
         <th th:text="${user.email}"></th>

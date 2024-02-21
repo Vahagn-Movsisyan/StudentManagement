@@ -8,7 +8,7 @@
 <th:block th:include="/fragment/headerFragment::userInfo"></th:block>
 <div>
     <img th:if="${currentUser.getPicName() != null}" th:src="@{/getImage(picName=${currentUser.picName})}" width="100"/>
-    <img th:if="${currentUser.getPicName() == null}" src="/img/user.png" width="40"/>
+    <img th:if="${currentUser.getPicName() == null}" src="/defaultImgs/user.png" width="40"/>
     <h1 th:text="${currentUser.name}"></h1>
     <a th:href="@{'/update/user/page/' + ${currentUser.id}}">Update Profile</a>
 </div>

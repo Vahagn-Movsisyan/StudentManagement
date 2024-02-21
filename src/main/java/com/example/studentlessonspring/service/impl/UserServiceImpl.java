@@ -5,7 +5,6 @@ import com.example.studentlessonspring.entity.UserType;
 import com.example.studentlessonspring.exceptions.EmailIsPresentException;
 import com.example.studentlessonspring.exceptions.PasswordNotMuchException;
 import com.example.studentlessonspring.repository.UserRepository;
-import com.example.studentlessonspring.service.LessonService;
 import com.example.studentlessonspring.service.UserService;
 import com.example.studentlessonspring.util.MultipartUtil;
 import lombok.RequiredArgsConstructor;

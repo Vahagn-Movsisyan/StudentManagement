@@ -10,7 +10,6 @@ public interface LessonService {
     Optional<Lesson> findById(int id);
     List<Lesson> findLessonByTeacherId(int id);
     List<Lesson> findLessonByStudentId(int id);
-
     List<Lesson> findAll();
     void deleteById(int id);
 }
